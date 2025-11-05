@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Employee Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            margin: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            padding: 10px;
+            margin: 10px;
+            width: 20%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 90%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Smart Employee Management System</h1>
+
+<!-- 🧾 Employee Form -->
+<form id="employeeForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="text" id="department" placeholder="Department" required>
+    <input type="number" id="salary" placeholder="Salary" required>
+    <button type="submit">Add Employee</button>
+</form>
+
+<!-- 📋 Employee Table -->
+<table id="employeeTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Department</th>
+        <th>Salary</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Dynamic Data -->
+    </tbody>
+</table>
+
+<script>
+    const apiBase = "http://localhost:8080/api/employees";
+
+    // 🟩 Load all employees
+    async function loadEmployees() {
+        const res = await fetch(apiBase);
+        const employees = await res.json();
+
+        const tableBody = document.querySelector("#employeeTable tbody");
+        tableBody.innerHTML = "";
+        employees.forEach(emp => {
+            const row = `
+                    <tr>
+                        <td>${emp.id}</td>
+                        <td>${emp.name}</td>
+                        <td>${emp.email}</td>
+                        <td>${emp.department}</td>
+                        <td>${emp.salary}</td>
+                    </tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    // 🟦 Handle Add Employee Form Submission
+    document.getElementById("employeeForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const newEmployee = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            department: document.getElementById("department").value,
+            salary: parseFloat(document.getElementById("salary").value)
+        };
+
+        const response = await fetch(apiBase, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newEmployee)
+        });
+
+        if (response.ok) {
+            alert("Employee added successfully ✅");
+            e.target.reset();
+            loadEmployees();
+        } else {
+            alert("Failed to add employee ❌");
+        }
+    });
+
+    // Auto load on page open
+    window.onload = loadEmployees;
+</script>
+
+</body>
+</html>
